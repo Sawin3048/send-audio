@@ -1,18 +1,23 @@
 import AudioRecorder from 'audio-recorder-polyfill'
+import mpegEncoder from 'audio-recorder-polyfill/mpeg-encoder'
+
+AudioRecorder.encoder = mpegEncoder
+AudioRecorder.prototype.mimeType = 'audio/mpeg'
 window.MediaRecorder = AudioRecorder
 
-const init = () => {
-  // const tieneSoporteUserMedia = () => !!navigator.mediaDevices?.getUserMedia;
+alert(MediaRecorder.isTypeSupported('audio/mpeg'))
 
-  // if (typeof MediaRecorder === "undefined" || !tieneSoporteUserMedia())
-  //   return alert("Tu navegador web no cumple los requisitos");
+const init = () => {
+  const tieneSoporteUserMedia = () => !!navigator.mediaDevices.getUserMedia;
+
+  if (typeof MediaRecorder === "undefined" || !tieneSoporteUserMedia())
+    return alert("Tu navegador web no cumple los requisitos");
 
   // DOM
   const $select = document.querySelector("#listaDeDispositivos") as HTMLSelectElement,
     $btnComenzarGrabacion = document.querySelector("#btnComenzarGrabacion") as HTMLButtonElement,
     $btnDetenerGrabacion = document.querySelector("#btnDetenerGrabacion") as HTMLButtonElement;
 
-  console.log($select, $btnComenzarGrabacion, $btnDetenerGrabacion)
   const limpiarSelect = () => {
     for (let x = $select.options.length - 1; x >= 0; x--) {
       $select.options.remove(x);
@@ -24,15 +29,18 @@ const init = () => {
 
   const llenarLista = () => {
     navigator.mediaDevices.enumerateDevices().then((dispositivos) => {
+      console.log(dispositivos)
       limpiarSelect();
+      const fragment = document.createDocumentFragment()
+
       dispositivos.forEach((dispositivo, indice) => {
-        console.log(dispositivos)
         if (dispositivo.kind === "audioinput") {
           const $opcion = document.createElement("option");
           $opcion.text = dispositivo.label || `Dispositivo ${indice + 1}`;
           $opcion.value = dispositivo.deviceId;
-          $select.appendChild($opcion);
+          fragment.appendChild($opcion);
         }
+        $select.appendChild(fragment)
       });
     });
   };
@@ -43,12 +51,10 @@ const init = () => {
 
     navigator.mediaDevices
       .getUserMedia({
-        audio: {
-          deviceId: $select.value,
-        },
+        audio: true
       })
       .then((stream) => {
-        mediaRecorder = new MediaRecorder(stream, { mimeType: "audio/mpeg" });
+        mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/mpeg' });
         mediaRecorder.start();
 
         const fragmentosDeAudio: Blob[] = [];
@@ -62,36 +68,36 @@ const init = () => {
           console.log(fragmentosDeAudio)
           const blobAudio = new Blob(fragmentosDeAudio);
           // Descargar
-          const formData = new FormData();
-          formData.append('archivo', blobAudio, 'nombre_archivo.mp3');
+          // const formData = new FormData();
+          // formData.append('archivo', blobAudio, 'nombre_archivo.mp3');
           // Realizar la solicitud POST utilizando fetch
-          fetch('/', {
-            method: 'POST',
-            body: formData
-          })
-            .then(response => {
-              // Manejar la respuesta aquí
-              console.log(response);
-              formData.delete('archivo')
-            })
-            .catch(error => {
-              // Manejar errores aquí
-              console.error('Error:', error);
-              formData.delete('archivo')
-            });
-          // const urlParaDescargar = URL.createObjectURL(blobAudio);
+          // fetch('/', {
+          //   method: 'POST',
+          //   body: formData
+          // })
+          //   .then(response => {
+          //     // Manejar la respuesta aquí
+          //     console.log(response);
+          //     formData.delete('archivo')
+          //   })
+          //   .catch(error => {
+          //     // Manejar errores aquí
+          //     console.error('Error:', error);
+          //     formData.delete('archivo')
+          //   });
+          const urlParaDescargar = URL.createObjectURL(blobAudio);
 
-          // let a = document.createElement("a");
-          // document.body.appendChild(a);
-          // a.href = urlParaDescargar;
-          // a.download = "grabacion.mp3";
-          // a.click();
-          // window.URL.revokeObjectURL(urlParaDescargar);
+          let a = document.createElement("a");
+          document.body.appendChild(a);
+          a.href = urlParaDescargar;
+          a.download = "grabacion.mp3";
+          a.click();
+          window.URL.revokeObjectURL(urlParaDescargar);
         });
       })
       .catch((error) => {
         console.log(error);
-        alert("No me diste permiso?");
+        alert(error);
       });
   };
 
@@ -106,4 +112,4 @@ const init = () => {
 
   llenarLista();
 };
-document.addEventListener("DOMContentLoaded", () => setTimeout(init, 3000));
+document.addEventListener("DOMContentLoaded", init);
