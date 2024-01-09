@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "server": "nodemon ./back/src"
+    "server": "node ./back/src"
   },
   "devDependencies": {
     "typescript": "^5.2.2",

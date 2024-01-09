@@ -1,13 +1,23 @@
 import express from "express";
 import fileUpload from "express-fileupload";
 import cors from "cors";
-import path from 'path'
+import path from "path";
+
 const app = express();
+
 app.use(cors());
 app.use(fileUpload());
-const __dirname = new URL(".", import.meta.url).pathname
-console.log(__dirname)
-app.use(express.static(path.resolve(__dirname,"../public")));
+const __dirname = new URL(".", import.meta.url).pathname;
+
+const publicFiles = path
+  .resolve(__dirname, "../public")
+  .split("\\")
+  .slice(1)
+  .join("\\");
+
+console.log(publicFiles);
+
+app.use(express.static(publicFiles));
 
 // app.get("/", (req, res) => res.send("Hola"));
 
