@@ -6,6 +6,8 @@ AudioRecorder.encoder = mpegEncoder
 AudioRecorder.prototype.mimeType = 'audio/mpeg'
 window.MediaRecorder = AudioRecorder
 
+type Params = { audio: { deviceId: string } } | { audio: boolean }
+
 // Objeto para manejar mejor
 export class RecordAudio {
   private isRecording = false
@@ -13,24 +15,16 @@ export class RecordAudio {
   private audioFragments: Blob[] = []
   private audio: Blob | null = null
   private stream: MediaStream | null = null
+  private params: Params
 
   constructor(audioDeviceId?: string) {
-    // const params = { audio: audioDeviceId ? { deviceId: audioDeviceId } : true }
-
-    // navigator.mediaDevices.getUserMedia(params).then(
-    //   (stream) => {
-    //     this.stream = stream
-    //     this.mediaRecorder = new MediaRecorder(stream)
-
-    //     this.mediaRecorder.addEventListener("dataavailable", (evt) => this.audioFragments.push(evt.data))
-
-    //   }
-    // )
-
+    audioDeviceId
+      ? this.params = { audio: { deviceId: audioDeviceId } }
+      : this.params = { audio: true }
   }
 
   async start() {
-    await navigator.mediaDevices.getUserMedia({ audio: true }).then(
+    await navigator.mediaDevices.getUserMedia(this.params).then(
       (stream) => {
         this.stream = stream
         this.mediaRecorder = new MediaRecorder(stream)
