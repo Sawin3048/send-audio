@@ -15,37 +15,46 @@ export class RecordAudio {
   private stream: MediaStream | null = null
 
   constructor(audioDeviceId?: string) {
-    const params = { audio: audioDeviceId ? { deviceId: audioDeviceId } : true }
+    // const params = { audio: audioDeviceId ? { deviceId: audioDeviceId } : true }
 
-    navigator.mediaDevices.getUserMedia(params).then(
+    // navigator.mediaDevices.getUserMedia(params).then(
+    //   (stream) => {
+    //     this.stream = stream
+    //     this.mediaRecorder = new MediaRecorder(stream)
+
+    //     this.mediaRecorder.addEventListener("dataavailable", (evt) => this.audioFragments.push(evt.data))
+
+    //   }
+    // )
+
+  }
+
+  async start() {
+    await navigator.mediaDevices.getUserMedia({ audio: true }).then(
       (stream) => {
         this.stream = stream
         this.mediaRecorder = new MediaRecorder(stream)
 
         this.mediaRecorder.addEventListener("dataavailable", (evt) => this.audioFragments.push(evt.data))
 
-      }
-    )
-
-  }
-
-  start() {
+      })
     if (this.mediaRecorder === null) return console.error('mediaRecorder no lo encuentro')
     if (this.isRecording) console.error('Ya se esta grabando')
 
     this.isRecording = true
 
     this.mediaRecorder.start()
-    this.mediaRecorder.addEventListener("dataavailable", (evt) => this.audioFragments.push(evt.data))
+    // this.mediaRecorder.addEventListener("dataavailable", (evt) => this.audioFragments.push(evt.data))
 
   }
 
   stop(): Promise<Blob> {
+
     return new Promise((res, rej) => {
       if (!this.isRecording) return rej('No se esta grabando')
 
-
       if (this.mediaRecorder === null) return rej('MediaRecorder no esta disponible, esto no deberia de pasar')
+
       this.mediaRecorder.addEventListener("stop", () => {
         this.stream?.getTracks().forEach(track => track.stop())
 

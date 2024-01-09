@@ -1,3 +1,4 @@
+
 import { RecordAudio } from "./audio";
 // import { downloadByBlob } from "./downloader";
 import { sendAudio } from "./upload-audio";
@@ -30,3 +31,7 @@ const toggle = async () => {
 }
 
 btn.addEventListener('click', toggle)
+
+
+// import { RecordAudio } from "./audio";
+// const a = new RecordAudio()
