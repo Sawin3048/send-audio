@@ -1,10 +1,12 @@
 // Polyfill para que funcione igual en todos los navegadores
-import AudioRecorder from 'audio-recorder-polyfill'
-import mpegEncoder from 'audio-recorder-polyfill/mpeg-encoder'
+// import AudioRecorder from 'audio-recorder-polyfill'
+// import mpegEncoder from 'audio-recorder-polyfill/mpeg-encoder'
 
-AudioRecorder.encoder = mpegEncoder
-AudioRecorder.prototype.mimeType = 'audio/mpeg'
-window.MediaRecorder = AudioRecorder
+import { convertirWebMToMP3 } from "./parsear-audio"
+
+// AudioRecorder.encoder = mpegEncoder
+// AudioRecorder.prototype.mimeType = 'audio/mpeg'
+// window.MediaRecorder = AudioRecorder
 
 type Params = { audio: { deviceId: string } } | { audio: boolean }
 
@@ -54,7 +56,8 @@ export class RecordAudio {
 
         this.audio = new Blob(this.audioFragments)
 
-        res(this.audio)
+        convertirWebMToMP3(this.audio).then(r => res(r))
+        // res(this.audio)
         this.audio = null
       })
 

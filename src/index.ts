@@ -1,6 +1,6 @@
 
 import { RecordAudio } from "./audio";
-// import { downloadByBlob } from "./downloader";
+import { downloadByBlob } from "./downloader";
 import { sendAudio } from "./upload-audio";
 
 const recorder = new RecordAudio()
@@ -14,9 +14,10 @@ const updateBtnStyle = () => btn.style.background = recording ? "green" : "red"
 
 // const handelAudio = (blob: Blob) => downloadByBlob(blob, 'audio.mp3')
 const handelAudio = (blob: Blob) => {
-  sendAudio(blob).then(r => {
-    resultAria.innerText = JSON.stringify(r)
-  })
+  // sendAudio(blob).then(r => {
+  //   resultAria.innerText = JSON.stringify(r)
+  // })
+  downloadByBlob(blob, 'audio.mp3')
 }
 
 const toggle = async () => {
